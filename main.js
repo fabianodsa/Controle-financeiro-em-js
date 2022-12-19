@@ -20,8 +20,15 @@ const adicionarTransacao = transaction => {
     transactionsUl.prepend(li)
 }
 
+const atualizarValores = () => {
+    const valorDasTransacoes = dummyTransactions.map(transaction => transaction.amount)
+    const total = valorDasTransacoes.reduce((acumulador, transaction) => acumulador + transaction, 0).toFixed(2)
+    console.log(total)
+}
+
 const init = () => {
     dummyTransactions.forEach(adicionarTransacao)
+    atualizarValores()
 }
 
 init()
