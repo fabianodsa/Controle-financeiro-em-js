@@ -6,13 +6,13 @@ const form = document.querySelector('#form')
 const inputNome = document.querySelector('#text')
 const inputValor = document.querySelector('#amount')
 
-const localStorage = JSON.parse(localStorage
-    .getItem('transactions'))
-let transactions = localStorage
-    .getItem('transactions') !== null ? localStorage : []
+const localStorageTransacao = JSON.parse(localStorage.getItem('transactions'))
+let transactions = localStorage.getItem('transactions') !== null ? localStorageTransacao : []
 
 const removerTransacao = ID => {
-    transactions = transactions.filter(transaction => transaction.id !== ID)
+    transactions = transactions.filter(transaction => 
+        transaction.id !== ID)
+        updateLocalStorage()
     init()
 }
 
@@ -63,28 +63,42 @@ const init = () => {
 
 init()
 
+const updateLocalStorage = () => {
+    localStorage.setItem('transactions', JSON.stringify(transactions))
+}
+
 const gerarID = () =>  Math.round(Math.random() * 1000)
 
-form.addEventListener('submit', event => {
+const adicionarTransacaoArray = (transacaoNome, transacaoValor) => {
+    transactions.push({
+        id: gerarID(), 
+        name: transacaoNome, 
+        amount: Number(transacaoValor)
+    })
+}
+
+const limparInputs = () => {
+    inputNome.value = ''
+    inputValor.value = ''
+}
+
+const handleForm = event => {
     event.preventDefault()
 
     const transacaoNome = inputNome.value.trim()
     const transacaoValor = inputValor.value.trim()
+    const inputEmBranco = transacaoNome === '' || transacaoValor === ''
 
-    if (transacaoNome === '' || transacaoValor === '') {
+
+    if (inputEmBranco) {
         alert("Preenha todos os campos!")
         return
     }
 
-    const transaction = { 
-        id: gerarID(), 
-        name: transacaoNome, 
-        amount: Number(transacaoValor)
-    }
-    
-    transactions.push(transaction)
+    adicionarTransacaoArray(transacaoNome, transacaoValor)
     init()
+    updateLocalStorage()
+    limparInputs()
+}
 
-    inputNome.value = ''
-    inputValor.value = ''
-})
+form.addEventListener('submit', handleForm)
