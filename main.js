@@ -6,14 +6,15 @@ const form = document.querySelector('#form')
 const inputNome = document.querySelector('#text')
 const inputValor = document.querySelector('#amount')
 
+const localStorage = JSON.parse(localStorage
+    .getItem('transactions'))
+let transactions = localStorage
+    .getItem('transactions') !== null ? localStorage : []
 
-
-const dummyTransactions = [
-    { id: 1, name: 'Bolo de brigadeiro', amount: -20},
-    { id: 2, name: 'Salário', amount: 300},
-    { id: 3, name: 'Torta de frango', amount: -10},
-    { id: 4, name: 'Violão', amount: 150}
-]
+const removerTransacao = ID => {
+    transactions = transactions.filter(transaction => transaction.id !== ID)
+    init()
+}
 
 const adicionarTransacao = transaction => {
     const operador = transaction.amount < 0 ? '-' : '+'
@@ -23,13 +24,17 @@ const adicionarTransacao = transaction => {
 
     li.classList.add(CSSClass)
     li.innerHTML = `
-        ${transaction.name} <span> ${operador} R$ ${valorSemOperador} </span><button class="delete-btn">x</button>
+        ${transaction.name} 
+        <span> ${operador} R$ ${valorSemOperador}</span>
+        <button class="delete-btn" onClick="removerTransacao(${transaction.id})">
+        x
+        </button>
     `
     transactionsUl.prepend(li)
 }
 
 const atualizarValores = () => {
-    const valorDasTransacoes = dummyTransactions
+    const valorDasTransacoes = transactions
         .map(transaction => transaction.amount)
     const total = valorDasTransacoes
         .reduce((acumulador, transaction) => acumulador + transaction, 0)
@@ -39,9 +44,9 @@ const atualizarValores = () => {
         .reduce((acumulador, value) => acumulador + value, 0)
         .toFixed(2)
     const despesas = Math.abs(valorDasTransacoes
-    .filter(value => value < 0)
-    .reduce((acumulador, value) => acumulador + value, 0))
-    .toFixed(2)
+        .filter(value => value < 0)
+        .reduce((acumulador, value) => acumulador + value, 0))
+        .toFixed(2)
     
     console.log(despesas)
 
@@ -51,7 +56,8 @@ const atualizarValores = () => {
 }
 
 const init = () => {
-    dummyTransactions.forEach(adicionarTransacao)
+    transactionsUl.innerHTML = ''
+    transactions.forEach(adicionarTransacao)
     atualizarValores()
 }
 
@@ -73,10 +79,10 @@ form.addEventListener('submit', event => {
     const transaction = { 
         id: gerarID(), 
         name: transacaoNome, 
-        amount: transacaoValor 
+        amount: Number(transacaoValor)
     }
     
-    dummyTransactions.push(transaction)
+    transactions.push(transaction)
     init()
 
     inputNome.value = ''
